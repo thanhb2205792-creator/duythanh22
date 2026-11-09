@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VSTEP Speaking Part 1 Trainer (B1 Goal)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Custom Scrollbar for smooth sidebar experience */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- Header Section -->
+  <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-white/10 p-2 rounded-xl backdrop-blur-sm">
+          <i data-lucide="mic" class="w-6 h-6 text-indigo-200"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg sm:text-xl tracking-tight leading-tight">VSTEP Speaking B1</h1>
+          <p class="text-xs text-indigo-200 hidden sm:block">Luyện tập Part 1 • Topic 1 - 20 (Aim: 20-30 từ/câu)</p>
+        </div>
+      </div>
+
+      <!-- Action & View Controls -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <button id="btnRandomMode" onclick="toggleRandomMode()" class="flex items-center space-x-2 bg-indigo-500 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium py-2 px-3 sm:px-4 rounded-xl transition shadow-sm border border-indigo-400/30">
+          <i data-lucide="shuffle" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Chế độ</span> <span>Luyện Ngẫu Nhiên</span>
+        </button>
+        <button id="mobileMenuBtn" onclick="toggleMobileSidebar()" class="md:hidden p-2 text-indigo-100 hover:text-white rounded-lg hover:bg-indigo-500">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row gap-6 relative">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebarOverlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden md:hidden"></div>
+
+    <!-- Sidebar Topic Navigation -->
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-50 w-72 bg-white md:bg-transparent shadow-xl md:shadow-none p-4 md:p-0 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0">
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 flex flex-col h-full md:h-[calc(100vh-6rem)]">
+        
+        <!-- Search Bar -->
+        <div class="relative mb-3">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input type="text" id="searchInput" oninput="filterTopics()" placeholder="Tìm kiếm Topic..." class="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
+        </div>
+
+        <!-- Master Progress -->
+        <div class="mb-4 bg-indigo-50/60 border border-indigo-100 rounded-xl p-3">
+          <div class="flex justify-between items-center text-xs font-semibold text-indigo-900 mb-1.5">
+            <span>Tiến độ đã học</span>
+            <span id="progressText">0/20 Topic</span>
+          </div>
+          <div class="w-full bg-indigo-200/50 rounded-full h-2 overflow-hidden">
+            <div id="progressBar" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Topic List -->
+        <div class="flex-1 overflow-y-auto space-y-1.5 pr-1" id="topicList">
+          <!-- Dynamic Topics insertion -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 min-w-0">
+
+      <!-- Standard Topic View -->
+      <div id="standardView" class="space-y-6">
+        <!-- Topic Header Card -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center space-x-2 px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold mb-2" id="topicBadge">
+              Topic 1
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900" id="topicTitle">School Activities</h2>
+            <p class="text-slate-500 text-sm mt-1" id="topicDesc">Luyện tập câu hỏi Part 1 về các hoạt động ở trường học</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button id="btnToggleTopicMastered" onclick="toggleTopicMastered()" class="flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm border transition">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span id="topicMasteredText">Đánh dấu đã thuộc</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3 Questions Container -->
+        <div class="space-y-5" id="questionsContainer">
+          <!-- Dynamic Questions render here -->
+        </div>
+      </div>
+
+      <!-- Random Practice Flashcard View (Hidden by default) -->
+      <div id="randomView" class="hidden space-y-6">
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+          <div class="flex justify-between items-center mb-4">
+            <span class="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200/60 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+              <i data-lucide="zap" class="w-3.5 h-3.5"></i> Chế độ phản xạ ngẫu nhiên
+            </span>
+            <button onclick="drawRandomQuestion()" class="text-xs font-medium text-indigo-600 hover:text-indigo-800 flex items-center space-x-1">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              <span>Đổi câu khác</span>
+            </button>
+          </div>
+
+          <!-- Random Question Card -->
+          <div class="border border-slate-200 rounded-2xl p-6 bg-slate-50/50 relative overflow-hidden">
+            <div class="text-xs font-medium text-slate-400 uppercase tracking-wider mb-2" id="randomTopicTitle">
+              Topic ?
+            </div>
+            <h3 class="text-xl sm:text-2xl font-bold text-slate-900 mb-6 leading-relaxed" id="randomQuestionText">
+              Nhấn nút bên dưới để bắt đầu luyện phản xạ ngẫu nhiên!
+            </h3>
+
+            <!-- Timer Widget inside Flashcard -->
+            <div class="bg-white border border-slate-200 rounded-xl p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+              <div class="flex items-center space-x-3">
+                <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+                  <i data-lucide="timer" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <div class="text-xs text-slate-500 font-medium">Đồng hồ đếm ngược</div>
+                  <div class="text-2xl font-bold text-slate-800 font-mono" id="randomTimerDisplay">00:30</div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2 w-full sm:w-auto">
+                <button onclick="startTimer('random')" class="flex-1 sm:flex-none px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium text-sm transition flex items-center justify-center space-x-1.5">
+                  <i data-lucide="play" class="w-4 h-4"></i> <span>Bắt đầu</span>
+                </button>
+                <button onclick="resetTimer('random')" class="flex-1 sm:flex-none px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium text-sm transition flex items-center justify-center space-x-1.5">
+                  <i data-lucide="rotate-ccw" class="w-4 h-4"></i> <span>Đặt lại</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Answer Toggle for Random -->
+            <button onclick="toggleRandomAnswer()" class="w-full py-3 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition flex items-center justify-center space-x-2 shadow-sm">
+              <i data-lucide="eye" class="w-4 h-4 text-slate-500"></i>
+              <span id="randomAnswerBtnText">Xem gợi ý câu trả lời & Từ vựng</span>
+            </button>
+
+            <!-- Random Answer Content -->
+            <div id="randomAnswerBox" class="hidden mt-6 pt-6 border-t border-slate-200 space-y-4">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <h4 class="text-sm font-semibold text-slate-700">Câu trả lời mẫu (Aim B1):</h4>
+                  <span id="randomWordBadge" class="px-2.5 py-0.5 rounded-full text-xs font-medium">0 từ</span>
+                </div>
+                <div class="p-4 bg-indigo-50/50 border border-indigo-100 rounded-xl text-slate-800 text-base leading-relaxed" id="randomAnswerText">
+                  ...
+                </div>
+              </div>
+
+              <!-- Vocabulary -->
+              <div>
+                <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Từ vựng ghi điểm (Key Vocabulary):</h4>
+                <div class="flex flex-wrap gap-2" id="randomVocabList">
+                  <!-- Dynamic vocab list -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+      VSTEP Speaking Part 1 Practice Tool • Biên soạn chuẩn B1 (20-30 words per answer)
+    </div>
+  </footer>
+
+  <!-- DATA & SCRIPT LOGIC -->
+  <script>
+    // 20 Topics Data with Exact B1 Standard (20-30 words/answer)
+    const topicsData = [
+      {
+        id: 1,
+        title: "School activities",
+        desc: "Hoạt động tại trường học",
+        questions: [
+          {
+            q: "Do you like joining school activities?",
+            a: "Yes, I really enjoy joining school activities. They help me relax after stressful classes and give me a great chance to make new friends.",
+            vocab: ["enjoy joining (thích tham gia)", "relax after classes (thư giãn sau giờ học)", "make new friends (kết bạn mới)"]
+          },
+          {
+            q: "When was the last time you joined a school activity?",
+            a: "The last time was two weeks ago. I took part in a green clean-up campaign at my university to collect trash around the campus.",
+            vocab: ["take part in (tham gia)", "clean-up campaign (chiến dịch dọn dẹp)", "campus (khuôn viên trường)"]
+          },
+          {
+            q: "What is your favorite school activity?",
+            a: "My favorite activity is playing in sports competitions, especially football, because it keeps me healthy and improves my teamwork skills with my classmates.",
+            vocab: ["sports competition (cuộc thi thể thao)", "keep healthy (giữ sức khỏe)", "teamwork skills (kỹ năng làm việc nhóm)"]
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Studying",
+        desc: "Việc học tập",
+        questions: [
+          {
+            q: "What is your favorite subject?",
+            a: "My favorite subject is English. I love learning it because it helps me communicate with foreigners and opens up many good job opportunities.",
+            vocab: ["communicate with foreigners (giao tiếp với người nước ngoài)", "job opportunities (cơ hội việc làm)"]
+          },
+          {
+            q: "Do you prefer studying alone or with other people?",
+            a: "I prefer studying with other people. When working in groups, we can discuss difficult exercises together and share useful learning materials.",
+            vocab: ["prefer (thích hơn)", "discuss difficult exercises (thảo luận bài tập khó)", "learning materials (tài liệu học tập)"]
+          },
+          {
+            q: "Do you prefer studying online or offline? Why?",
+            a: "I prefer studying offline because I can interact directly with my teachers and concentrate better without being distracted by the Internet.",
+            vocab: ["interact directly (tương tác trực tiếp)", "concentrate better (tập trung tốt hơn)", "be distracted (bị xao nhãng)"]
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "Crowded places",
+        desc: "Nơi đông người",
+        questions: [
+          {
+            q: "Have you been to a crowded place? Where was it?",
+            a: "Yes, I have. I went to Ben Thanh Market during the last Tet holiday, and it was extremely crowded with many tourists and shoppers.",
+            vocab: ["Tet holiday (dịp lễ Tết)", "extremely crowded (cực kỳ đông đúc)", "tourists and shoppers (du khách và người mua sắm)"]
+          },
+          {
+            q: "How did you feel when you were in that crowded place?",
+            a: "I felt a bit overwhelmed and tired because of the noise and heat, but it was also a lively and exciting experience.",
+            vocab: ["overwhelmed (ngợp/choáng ngợp)", "lively atmosphere (bầu không khí sôi động)", "exciting experience (trải nghiệm thú vị)"]
+          },
+          {
+            q: "What are some tips to avoid crowded places?",
+            a: "To avoid crowds, you should travel during off-peak hours or visit popular destinations on weekdays rather than on weekends.",
+            vocab: ["avoid crowds (tránh đám đông)", "off-peak hours (giờ thấp điểm)", "popular destinations (điểm đến phổ biến)"]
+          }
+        ]
+      },
+      {
+        id: 4,
+        title: "Gifts",
+        desc: "Quà tặng",
+        questions: [
+          {
+            q: "How often do you give gifts?",
+            a: "I give gifts a few times a year, mainly on special occasions like birthdays, Christmas, or Teachers' Day for my family and friends.",
+            vocab: ["special occasions (dịp đặc biệt)", "Teachers' Day (ngày Nhà giáo)"]
+          },
+          {
+            q: "What is the best gift that you have received?",
+            a: "The best gift I have received is a smartphone from my parents when I passed the entrance exam to my university.",
+            vocab: ["received (nhận được)", "passed the entrance exam (đậu kỳ thi đầu vào)"]
+          },
+          {
+            q: "Do you prefer giving gifts or receiving gifts? Why?",
+            a: "I prefer giving gifts because seeing the happy expressions on my friends' faces when they receive my present makes me feel wonderful.",
+            vocab: ["happy expressions (nét mặt hạnh phúc)", "feel wonderful (cảm thấy tuyệt vời)"]
+          }
+        ]
+      },
+      {
+        id: 5,
+        title: "Success",
+        desc: "Sự thành công",
+        questions: [
+          {
+            q: "What is the greatest success you have achieved?",
+            a: "My greatest success so far was passing the university entrance exam with high scores, which made my parents very proud of me.",
+            vocab: ["achieved (đạt được)", "high scores (điểm số cao)", "proud of me (tự hào về tôi)"]
+          },
+          {
+            q: "Who do you usually share your success with?",
+            a: "I usually share my success with my parents and close friends because they are always there to support and encourage me.",
+            vocab: ["share success with (chia sẻ thành công với)", "support and encourage (ủng hộ và động viên)"]
+          },
+          {
+            q: "What do you need to do to succeed in the future?",
+            a: "I need to work hard, practice my English skills every day, and learn how to manage my time effectively to achieve my target.",
+            vocab: ["work hard (làm việc chăm chỉ)", "manage time effectively (quản lý thời gian hiệu quả)", "achieve target (đạt mục tiêu)"]
+          }
+        ]
+      },
+      {
+        id: 6,
+        title: "Advertisements",
+        desc: "Quảng cáo",
+        questions: [
+          {
+            q: "Where do you usually see advertisements?",
+            a: "I usually see advertisements on social media apps like Facebook and YouTube, as well as on big billboards along the streets.",
+            vocab: ["social media apps (ứng dụng mạng xã hội)", "billboards (biển quảng cáo lớn)"]
+          },
+          {
+            q: "Do you often click on advertisements?",
+            a: "No, I rarely click on advertisements because I find them quite annoying when I am browsing the Internet or watching videos online.",
+            vocab: ["rarely click (hiếm khi bấm vào)", "annoying (phiền phức/gây khó chịu)", "browse the Internet (lướt mạng)"]
+          },
+          {
+            q: "What kind of advertisement do you like best?",
+            a: "I like funny and creative video advertisements best because they bring me entertainment and make a lasting impression on me.",
+            vocab: ["creative video (video sáng tạo)", "entertainment (sự giải trí)", "lasting impression (ấn tượng lâu dài)"]
+          }
+        ]
+      },
+      {
+        id: 7,
+        title: "Traveling",
+        desc: "Du lịch",
+        questions: [
+          {
+            q: "Do you like traveling during holidays?",
+            a: "Yes, I love traveling during holidays. It is a wonderful way for me to relax and refresh my mind after long months of studying.",
+            vocab: ["wonderful way (cách tuyệt vời)", "refresh my mind (nạp lại năng lượng tinh thần)"]
+          },
+          {
+            q: "If yes, where do you like to go and why?",
+            a: "I like going to coastal cities like Da Nang because I really enjoy swimming in the sea and eating fresh seafood.",
+            vocab: ["coastal cities (thành phố ven biển)", "fresh seafood (hải sản tươi sống)"]
+          },
+          {
+            q: "Do you prefer traveling inside your country or abroad? Why?",
+            a: "I prefer traveling inside my country because Vietnam has many beautiful places to explore, and it is much more affordable for students.",
+            vocab: ["travel inside (du lịch trong nước)", "beautiful places to explore (nhiều cảnh đẹp để khám phá)", "affordable (giá cả hợp lý)"]
+          }
+        ]
+      },
+      {
+        id: 8,
+        title: "Sports",
+        desc: "Thể thao",
+        questions: [
+          {
+            q: "Do you like playing sports?",
+            a: "Yes, I really enjoy playing sports. It is a great way to stay fit, improve my health, and reduce daily stress.",
+            vocab: ["stay fit (giữ vóc dáng cân đối)", "improve health (cải thiện sức khỏe)", "reduce stress (giảm căng thẳng)"]
+          },
+          {
+            q: "What sport do you like the most? Why?",
+            a: "Badminton is my favorite sport because it is easy to play, keeps me active, and I can play it with my friends anywhere.",
+            vocab: ["badminton (cầu lông)", "keep active (giữ năng động)"]
+          },
+          {
+            q: "Do you prefer playing sports alone or in a team?",
+            a: "I prefer playing in a team because it is more fun and helps me build good relationships and teamwork skills with others.",
+            vocab: ["in a team (theo đội/nhóm)", "build good relationships (xây dựng mối quan hệ tốt)"]
+          }
+        ]
+      },
+      {
+        id: 9,
+        title: "Reading",
+        desc: "Đọc sách",
+        questions: [
+          {
+            q: "What kind of books do you usually read?",
+            a: "I usually read self-help books and short story collections because they give me useful life advice and help me relax before sleeping.",
+            vocab: ["self-help books (sách phát triển bản thân)", "life advice (lời khuyên cuộc sống)"]
+          },
+          {
+            q: "What kinds of books should children read?",
+            a: "Children should read fairy tales and comic books because these stories boost their imagination and teach them valuable moral lessons.",
+            vocab: ["fairy tales (truyện cổ tích)", "boost imagination (kích thích trí tưởng tượng)", "moral lessons (bài học đạo đức)"]
+          },
+          {
+            q: "Do you prefer reading printed books or e-books? Why?",
+            a: "I prefer printed books because holding a real book feels more satisfying and reading on paper does not cause eye strain like screens.",
+            vocab: ["printed books (sách in giấy)", "satisfying (thỏa mãn/thích thú)", "eye strain (mỏi mắt)"]
+          }
+        ]
+      },
+      {
+        id: 10,
+        title: "Public events",
+        desc: "Sự kiện công cộng",
+        questions: [
+          {
+            q: "What is your favorite public event?",
+            a: "My favorite public event is the New Year Countdown festival because of the lively music, vibrant atmosphere, and beautiful fireworks displays.",
+            vocab: ["Countdown festival (lễ hội đếm ngược)", "vibrant atmosphere (bầu không khí sôi động)", "fireworks display (pháo hoa)"]
+          },
+          {
+            q: "What do you prepare when you celebrate a public event?",
+            a: "I usually prepare comfortable clothes, charge my phone battery fully, and bring some cash to buy snacks or drinks with friends.",
+            vocab: ["comfortable clothes (quần áo thoải mái)", "charge phone battery (sạc đầy pin điện thoại)"]
+          },
+          {
+            q: "What are the benefits of having public events?",
+            a: "Public events help bring community members closer together, preserve cultural values, and boost local tourism and economic development.",
+            vocab: ["bring community together (gắn kết cộng đồng)", "preserve cultural values (gìn giữ giá trị văn hóa)", "boost local tourism (thúc đẩy du lịch địa phương)"]
+          }
+        ]
+      },
+      {
+        id: 11,
+        title: "Friendship",
+        desc: "Tình bạn",
+        questions: [
+          {
+            q: "What do you think makes a good friend?",
+            a: "In my opinion, a good friend should be honest, trustworthy, and always ready to listen and support you through tough times.",
+            vocab: ["honest and trustworthy (thật thà và đáng tin cậy)", "tough times (thời điểm khó khăn)"]
+          },
+          {
+            q: "Do you know how to be a good friend?",
+            a: "Yes, I always try to be helpful, respect my friends' feelings, and keep their secrets whenever they confide in me.",
+            vocab: ["respect feelings (tôn trọng cảm xúc)", "keep secrets (giữ bí mật)", "confide in (tâm sự)"]
+          },
+          {
+            q: "How do you keep in touch with your friends from secondary school?",
+            a: "I keep in touch with them mainly through social media platforms like Zalo and Messenger, and we hang out together on weekends.",
+            vocab: ["keep in touch with (giữ liên lạc)", "hang out together (đi chơi cùng nhau)"]
+          }
+        ]
+      },
+      {
+        id: 12,
+        title: "Colors",
+        desc: "Màu sắc",
+        questions: [
+          {
+            q: "What is your favorite color? Why?",
+            a: "My favorite color is blue because it gives me a sense of peace, calmness, and freshness whenever I look at it.",
+            vocab: ["sense of peace (cảm giác bình yên)", "calmness and freshness (sự êm đềm và tươi mát)"]
+          },
+          {
+            q: "Do you think your favorite color has a meaning?",
+            a: "Yes, I think blue symbolizes peace, trust, and hope, which aligns very well with my quiet and friendly personality.",
+            vocab: ["symbolize (tượng trưng cho)", "aligns with personality (phù hợp với tính cách)"]
+          },
+          {
+            q: "Do you think colors can affect your mood?",
+            a: "Yes, absolutely. Bright colors like yellow can make people feel happy and energetic, while dark colors can make them feel calm or low.",
+            vocab: ["affect mood (ảnh hưởng tâm trạng)", "bright colors (màu sắc tươi sáng)", "energetic (năng lượng)"]
+          }
+        ]
+      },
+      {
+        id: 13,
+        title: "Job interviews",
+        desc: "Phỏng vấn xin việc",
+        questions: [
+          {
+            q: "Have you ever been in an interview?",
+            a: "Yes, I have. I participated in an interview last year when I applied for a part-time position at an English center.",
+            vocab: ["participate in (tham gia)", "applied for part-time position (ứng tuyển vị trí bán thời gian)"]
+          },
+          {
+            q: "How do you usually prepare for a job interview?",
+            a: "I usually research the company thoroughly, dress neatly, and practice answering common interview questions in front of a mirror.",
+            vocab: ["research thoroughly (tìm hiểu kỹ lưỡng)", "dress neatly (ăn mặc gọn gàng)", "in front of a mirror (trước gương)"]
+          },
+          {
+            q: "How can you make a good impression in your interview?",
+            a: "You can make a good impression by arriving on time, wearing polite clothes, keeping a confident smile, and speaking clearly.",
+            vocab: ["make a good impression (tạo ấn tượng tốt)", "arrive on time (đến đúng giờ)", "confident smile (nụ cười tự tin)"]
+          }
+        ]
+      },
+      {
+        id: 14,
+        title: "Shopping",
+        desc: "Mua sắm",
+        questions: [
+          {
+            q: "How often do you go shopping?",
+            a: "I go shopping about twice a month, mostly to buy groceries, clothes, or essential household items for my daily needs.",
+            vocab: ["groceries (thực phẩm hàng ngày)", "essential household items (vật dụng thiết yếu)"]
+          },
+          {
+            q: "What do you usually buy when you go shopping?",
+            a: "I usually buy fresh food, snacks, personal care items, and occasionally clothes or shoes when there are discount promotions.",
+            vocab: ["personal care items (đồ chăm sóc cá nhân)", "discount promotions (khuyến mãi giảm giá)"]
+          },
+          {
+            q: "Do you prefer shopping online or in stores? Why?",
+            a: "I prefer shopping online because it saves a lot of time, and I can easily compare prices to get the best deals.",
+            vocab: ["save time (tiết kiệm thời gian)", "compare prices (so sánh giá)", "best deals (ưu đãi tốt nhất)"]
+          }
+        ]
+      },
+      {
+        id: 15,
+        title: "Days of the week",
+        desc: "Các ngày trong tuần",
+        questions: [
+          {
+            q: "Which day of the week do you like the most? Why?",
+            a: "I like Saturday the most because I can sleep in, hang out with my close friends, and relax without worrying about school.",
+            vocab: ["sleep in (ngủ nướng)", "hang out (đi chơi)", "without worrying (không phải lo lắng)"]
+          },
+          {
+            q: "Which day is the busiest for you?",
+            a: "Monday is the busiest day for me because I have full-day lectures at university and a lot of tasks to start the week.",
+            vocab: ["busiest day (ngày bận rộn nhất)", "full-day lectures (buổi học cả ngày)"]
+          },
+          {
+            q: "What do you usually do to relax after work or study?",
+            a: "After studying, I usually listen to soft music, watch short funny videos on my phone, or take a hot shower to unwind.",
+            vocab: ["soft music (nhạc nhẹ)", "take a hot shower (tắm nước nóng)", "unwind (thư giãn)"]
+          }
+        ]
+      },
+      {
+        id: 16,
+        title: "Morning habits",
+        desc: "Thói quen buổi sáng",
+        questions: [
+          {
+            q: "What time do you usually wake up?",
+            a: "I usually wake up at 6:30 AM on weekdays so that I have enough time to prepare before going to school.",
+            vocab: ["wake up (thức dậy)", "weekdays (ngày trong tuần)", "enough time to prepare (đủ thời gian chuẩn bị)"]
+          },
+          {
+            q: "What do you do first when you wake up?",
+            a: "The first thing I do after waking up is drink a glass of warm water and brush my teeth to feel refreshed.",
+            vocab: ["glass of warm water (ly nước ấm)", "brush teeth (đánh răng)", "feel refreshed (cảm thấy sảng khoái)"]
+          },
+          {
+            q: "Do you want to change any habits in the morning? Why?",
+            a: "Yes, I want to stop checking my phone immediately after waking up because it distracts me and wastes my precious morning time.",
+            vocab: ["check phone immediately (zào điện thoại ngay)", "precious time (thời gian quý giá)"]
+          }
+        ]
+      },
+      {
+        id: 17,
+        title: "Social media",
+        desc: "Mạng xã hội",
+        questions: [
+          {
+            q: "Do you often use social media?",
+            a: "Yes, I use social media every day, especially platforms like Facebook, TikTok, and Instagram during my break time.",
+            vocab: ["social media platforms (nền tảng mạng xã hội)", "break time (giờ nghỉ ngơi)"]
+          },
+          {
+            q: "What do you usually do on social media?",
+            a: "I usually scroll through news feeds, watch entertainment videos, send messages to my friends, and follow educational channels.",
+            vocab: ["scroll news feeds (lướt bảng tin)", "entertainment videos (video giải trí)", "educational channels (kênh giáo dục)"]
+          },
+          {
+            q: "Do you think social media is good or bad for people? Why?",
+            a: "It has both sides, but it is good if people use it smartly to connect with others and learn new knowledge moderately.",
+            vocab: ["both sides (hai mặt)", "connect with others (kết nối mọi người)", "moderately (một cách điều độ)"]
+          }
+        ]
+      },
+      {
+        id: 18,
+        title: "The cinema",
+        desc: "Rạp chiếu phim",
+        questions: [
+          {
+            q: "Is there a cinema in your hometown?",
+            a: "Yes, there are several modern cinemas in my hometown, such as CGV and Lotte Cinema, which are very popular among teenagers.",
+            vocab: ["modern cinemas (rạp phim hiện đại)", "popular among teenagers (phổ biến với giới trẻ)"]
+          },
+          {
+            q: "Do you prefer watching films at home or at the cinema?",
+            a: "I prefer watching films at the cinema because of the massive screen, surround sound system, and exciting movie atmosphere.",
+            vocab: ["massive screen (màn hình lớn)", "surround sound (âm thanh vòm)", "exciting atmosphere (bầu không khí hào hứng)"]
+          },
+          {
+            q: "When was the last time you went to the cinema?",
+            a: "The last time I went to the cinema was two weeks ago with my best friends to watch a comedy movie.",
+            vocab: ["two weeks ago (2 tuần trước)", "comedy movie (phim hài)"]
+          }
+        ]
+      },
+      {
+        id: 19,
+        title: "Self-care",
+        desc: "Chăm sóc bản thân",
+        questions: [
+          {
+            q: "Do you like taking care of yourself?",
+            a: "Yes, I do. Taking care of my physical and mental health helps me feel happy, confident, and full of positive energy.",
+            vocab: ["physical and mental health (sức khỏe thể chất và tinh thần)", "positive energy (năng lượng tích cực)"]
+          },
+          {
+            q: "How often do you take care of yourself?",
+            a: "I do it every day by eating healthy meals, doing light exercises, getting enough sleep, and keeping a skincare routine.",
+            vocab: ["healthy meals (bữa ăn lành mạnh)", "light exercises (bài tập nhẹ)", "skincare routine (quy trình chăm sóc da)"]
+          },
+          {
+            q: "Do you think self-care increases productivity? Why?",
+            a: "Yes, definitely. When your body is healthy and your mind is well-rested, you can focus much better and work more efficiently.",
+            vocab: ["well-rested mind (tinh thần nghỉ ngơi tốt)", "focus better (tập trung tốt hơn)", "work efficiently (làm việc hiệu quả)"]
+          }
+        ]
+      },
+      {
+        id: 20,
+        title: "Drinking green tea",
+        desc: "Uống trà xanh",
+        questions: [
+          {
+            q: "Do you like drinking green tea? Why?",
+            a: "Yes, I like drinking green tea because it has a refreshing taste and helps me stay awake and focused while studying.",
+            vocab: ["refreshing taste (hương vị thanh mát)", "stay awake (tỉnh táo)", "focused while studying (tập trung khi học)"]
+          },
+          {
+            q: "Are there any benefits of drinking green tea?",
+            a: "Yes, green tea contains antioxidants that are very good for health, improve skin condition, and help burn body fat.",
+            vocab: ["antioxidants (chất chống oxy hóa)", "improve skin condition (cải thiện làn da)", "burn body fat (đốt cháy mỡ)"]
+          },
+          {
+            q: "Do you prefer green tea or milk tea? Why?",
+            a: "I prefer green tea because it is much healthier, natural, and contains far less sugar and calories than milk tea.",
+            vocab: ["healthier and natural (lành mạnh và tự nhiên)", "less sugar and calories (ít đường và calo)"]
+          }
+        ]
+      }
+    ];
+
+    // State Management
+    let currentTopicId = 1;
+    let masteredTopics = JSON.parse(localStorage.getItem('vstep_mastered_topics') || '[]');
+    let activeTimers = {};
+    let isRandomMode = false;
+    let currentRandomQuestion = null;
+
+    // Helper: Word Counter
+    function getWordCount(text) {
+      if (!text) return 0;
+      return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+    }
+
+    // Initialize Page
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTopicList();
+      loadTopic(1);
+      updateMasterProgress();
+      lucide.createIcons();
+    });
+
+    // Render Topic Sidebar
+    function renderTopicList(filterText = '') {
+      const topicListEl = document.getElementById('topicList');
+      topicListEl.innerHTML = '';
+
+      const filtered = topicsData.filter(t => 
+        t.title.toLowerCase().includes(filterText.toLowerCase()) || 
+        t.desc.toLowerCase().includes(filterText.toLowerCase())
+      );
+
+      filtered.forEach(topic => {
+        const isMastered = masteredTopics.includes(topic.id);
+        const isActive = topic.id === currentTopicId && !isRandomMode;
+
+        const item = document.createElement('button');
+        item.onclick = () => {
+          if (isRandomMode) toggleRandomMode();
+          loadTopic(topic.id);
+          closeMobileSidebar();
+        };
+
+        item.className = `w-full text-left p-3 rounded-xl transition flex items-center justify-between group border ${
+          isActive 
+            ? 'bg-indigo-50/80 border-indigo-200 text-indigo-900 font-semibold shadow-sm' 
+            : 'hover:bg-slate-50 border-transparent text-slate-700'
+        }`;
+
+        item.innerHTML = `
+          <div class="min-w-0 flex-1 pr-2">
+            <div class="text-xs ${isActive ? 'text-indigo-600' : 'text-slate-400'} font-medium mb-0.5">Topic ${topic.id}</div>
+            <div class="text-sm truncate font-medium leading-snug">${topic.title}</div>
+          </div>
+          <div class="shrink-0 flex items-center">
+            ${isMastered 
+              ? '<span class="text-emerald-500"><i data-lucide="check-circle-2" class="w-4 h-4"></i></span>' 
+              : '<span class="text-slate-300 group-hover:text-slate-400"><i data-lucide="chevron-right" class="w-4 h-4"></i></span>'}
+          </div>
+        `;
+        topicListEl.appendChild(item);
+      });
+
+      lucide.createIcons();
+    }
+
+    // Filter Topics Search
+    function filterTopics() {
+      const searchVal = document.getElementById('searchInput').value;
+      renderTopicList(searchVal);
+    }
+
+    // Load Specific Topic
+    function loadTopic(topicId) {
+      currentTopicId = topicId;
+      const topic = topicsData.find(t => t.id === topicId);
+      if (!topic) return;
+
+      document.getElementById('topicBadge').innerText = `Topic ${topic.id}`;
+      document.getElementById('topicTitle').innerText = topic.title;
+      document.getElementById('topicDesc').innerText = topic.desc;
+
+      updateMasteredButtonState();
+      renderTopicList(document.getElementById('searchInput').value);
+
+      // Render 3 Questions
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = '';
+
+      topic.questions.forEach((qObj, index) => {
+        const wordCount = getWordCount(qObj.a);
+        const isOptimal = wordCount >= 20 && wordCount <= 30;
+        const timerId = `timer_${topic.id}_${index}`;
+
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm space-y-4';
+
+        card.innerHTML = `
+          <!-- Question Header & Timer -->
+          <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b border-slate-100">
+            <div class="flex items-start space-x-3">
+              <span class="px-2.5 py-1 bg-indigo-100 text-indigo-800 rounded-lg text-xs font-bold shrink-0 mt-0.5">Q${index + 1}</span>
+              <h3 class="font-bold text-slate-900 text-base sm:text-lg leading-snug">${qObj.q}</h3>
+            </div>
+            
+            <!-- Quick Timer Button -->
+            <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200/70 px-3 py-1.5 rounded-xl shrink-0 self-start">
+              <i data-lucide="clock" class="w-4 h-4 text-slate-500"></i>
+              <span id="${timerId}_display" class="font-mono text-sm font-semibold text-slate-700">00:30</span>
+              <button onclick="startQuestionTimer('${timerId}')" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium px-1.5 py-0.5 rounded bg-indigo-50">Thử nói</button>
+            </div>
+          </div>
+
+          <!-- Answer Accordion Toggle -->
+          <div>
+            <button onclick="toggleAnswer('${topic.id}_${index}')" class="w-full flex items-center justify-between text-left py-2 px-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl transition border border-slate-200/60 text-xs sm:text-sm font-medium text-slate-700">
+              <span class="flex items-center space-x-2">
+                <i data-lucide="message-square-quote" class="w-4 h-4 text-indigo-500"></i>
+                <span>Xem câu trả lời mẫu & Từ vựng (B1 Aim)</span>
+              </span>
+              <i id="icon_${topic.id}_${index}" data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform duration-200"></i>
+            </button>
+
+            <!-- Hidden Answer Box -->
+            <div id="box_${topic.id}_${index}" class="hidden mt-3 p-4 bg-slate-50/70 border border-slate-200/80 rounded-xl space-y-4">
+              
+              <!-- Answer text + Word count badge -->
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Gợi ý trả lời:</span>
+                  <span class="px-2 py-0.5 rounded-full text-xs font-semibold ${isOptimal ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-100 text-amber-800'}">
+                    Word count: ${wordCount} words ${isOptimal ? '✓ (Chuẩn B1: 20-30)' : ''}
+                  </span>
+                </div>
+                <p class="text-slate-800 text-sm sm:text-base leading-relaxed bg-white p-3.5 rounded-xl border border-slate-200/60 shadow-xs">
+                  "${qObj.a}"
+                </p>
+              </div>
+
+              <!-- Key Vocabulary -->
+              <div>
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-2">Từ vựng quan trọng (Key Phrases):</span>
+                <div class="flex flex-wrap gap-2">
+                  ${qObj.vocab.map(v => `<span class="px-2.5 py-1 bg-white border border-slate-200 text-slate-700 text-xs rounded-lg font-medium shadow-2xs">${v}</span>`).join('')}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    // Toggle Answer visibility
+    function toggleAnswer(key) {
+      const box = document.getElementById(`box_${key}`);
+      const icon = document.getElementById(`icon_${key}`);
+      if (box.classList.contains('hidden')) {
+        box.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+      } else {
+        box.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Mastered Topic Toggle
+    function toggleTopicMastered() {
+      const index = masteredTopics.indexOf(currentTopicId);
+      if (index > -1) {
+        masteredTopics.splice(index, 1);
+      } else {
+        masteredTopics.push(currentTopicId);
+      }
+      localStorage.setItem('vstep_mastered_topics', JSON.stringify(masteredTopics));
+      updateMasteredButtonState();
+      updateMasterProgress();
+      renderTopicList(document.getElementById('searchInput').value);
+    }
+
+    function updateMasteredButtonState() {
+      const isMastered = masteredTopics.includes(currentTopicId);
+      const btn = document.getElementById('btnToggleTopicMastered');
+      const text = document.getElementById('topicMasteredText');
+
+      if (isMastered) {
+        btn.className = 'flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm border bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 transition';
+        text.innerText = 'Đã thuộc Topic này ✓';
+      } else {
+        btn.className = 'flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm border bg-white border-slate-200 text-slate-700 hover:bg-slate-50 transition shadow-xs';
+        text.innerText = 'Đánh dấu đã thuộc';
+      }
+    }
+
+    function updateMasterProgress() {
+      const count = masteredTopics.length;
+      const total = topicsData.length;
+      const pct = Math.round((count / total) * 100);
+
+      document.getElementById('progressText').innerText = `${count}/${total} Topic`;
+      document.getElementById('progressBar').style.width = `${pct}%`;
+    }
+
+    // Timer Logic for Individual Questions
+    function startQuestionTimer(timerId) {
+      if (activeTimers[timerId]) clearInterval(activeTimers[timerId]);
+      
+      let timeLeft = 30;
+      const display = document.getElementById(`${timerId}_display`);
+
+      display.classList.add('text-indigo-600', 'animate-pulse');
+
+      activeTimers[timerId] = setInterval(() => {
+        timeLeft--;
+        const sec = timeLeft < 10 ? `0${timeLeft}` : timeLeft;
+        display.innerText = `00:${sec}`;
+
+        if (timeLeft <= 0) {
+          clearInterval(activeTimers[timerId]);
+          display.classList.remove('text-indigo-600', 'animate-pulse');
+          display.classList.add('text-emerald-600');
+          display.innerText = "Hết giờ!";
+          setTimeout(() => {
+            display.innerText = "00:30";
+            display.classList.remove('text-emerald-600');
+          }, 2000);
+        }
+      }, 1000);
+    }
+
+    // Toggle Random Mode (Flashcard Practice)
+    function toggleRandomMode() {
+      isRandomMode = !isRandomMode;
+      const stdView = document.getElementById('standardView');
+      const rndView = document.getElementById('randomView');
+      const btn = document.getElementById('btnRandomMode');
+
+      if (isRandomMode) {
+        stdView.classList.add('hidden');
+        rndView.classList.remove('hidden');
+        btn.classList.add('bg-amber-600', 'border-amber-400');
+        drawRandomQuestion();
+      } else {
+        stdView.classList.remove('hidden');
+        rndView.classList.add('hidden');
+        btn.classList.remove('bg-amber-600', 'border-amber-400');
+        loadTopic(currentTopicId);
+      }
+    }
+
+    // Draw Random Question from all 20 Topics
+    function drawRandomQuestion() {
+      const randomTopicIndex = Math.floor(Math.random() * topicsData.length);
+      const selectedTopic = topicsData[randomTopicIndex];
+      const randomQIndex = Math.floor(Math.random() * selectedTopic.questions.length);
+      const qObj = selectedTopic.questions[randomQIndex];
+
+      currentRandomQuestion = {
+        topicId: selectedTopic.id,
+        topicTitle: selectedTopic.title,
+        ...qObj
+      };
+
+      document.getElementById('randomTopicTitle').innerText = `Topic ${selectedTopic.id}: ${selectedTopic.title}`;
+      document.getElementById('randomQuestionText').innerText = `"${qObj.q}"`;
+      document.getElementById('randomAnswerText').innerText = `"${qObj.a}"`;
+
+      // Word count
+      const count = getWordCount(qObj.a);
+      const badge = document.getElementById('randomWordBadge');
+      badge.innerText = `${count} words (Aim B1: 20-30)`;
+      badge.className = count >= 20 && count <= 30 ? 'px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800' : 'px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800';
+
+      // Vocab
+      const vocabList = document.getElementById('randomVocabList');
+      vocabList.innerHTML = qObj.vocab.map(v => `<span class="px-2.5 py-1 bg-white border border-slate-200 text-slate-700 text-xs rounded-lg font-medium">${v}</span>`).join('');
+
+      // Hide answer by default
+      document.getElementById('randomAnswerBox').classList.add('hidden');
+      document.getElementById('randomAnswerBtnText').innerText = "Xem gợi ý câu trả lời & Từ vựng";
+
+      resetTimer('random');
+    }
+
+    function toggleRandomAnswer() {
+      const box = document.getElementById('randomAnswerBox');
+      const btnText = document.getElementById('randomAnswerBtnText');
+      if (box.classList.contains('hidden')) {
+        box.classList.remove('hidden');
+        btnText.innerText = "Ẩn gợi ý câu trả lời";
+      } else {
+        box.classList.add('hidden');
+        btnText.innerText = "Xem gợi ý câu trả lời & Từ vựng";
+      }
+    }
+
+    // Random Timer logic
+    let randomTimerInterval = null;
+    function startTimer(type) {
+      if (randomTimerInterval) clearInterval(randomTimerInterval);
+      let timeLeft = 30;
+      const display = document.getElementById('randomTimerDisplay');
+
+      randomTimerInterval = setInterval(() => {
+        timeLeft--;
+        const sec = timeLeft < 10 ? `0${timeLeft}` : timeLeft;
+        display.innerText = `00:${sec}`;
+
+        if (timeLeft <= 0) {
+          clearInterval(randomTimerInterval);
+          display.innerText = "Hết giờ!";
+        }
+      }, 1000);
+    }
+
+    function resetTimer(type) {
+      if (randomTimerInterval) clearInterval(randomTimerInterval);
+      document.getElementById('randomTimerDisplay').innerText = "00:30";
+    }
+
+    // Mobile Sidebar UI toggle
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+    }
+
+    function closeMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
